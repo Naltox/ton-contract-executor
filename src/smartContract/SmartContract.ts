@@ -53,7 +53,7 @@ type SmartContractConfig = {
     runner: TvmRunner
 }
 
-type FailedExecutionResult = {
+export type FailedExecutionResult = {
     type: 'failed'
     exit_code: number
     gas_consumed: number,
@@ -63,7 +63,7 @@ type FailedExecutionResult = {
     logs: string
 }
 
-type SuccessfulExecutionResult = {
+export type SuccessfulExecutionResult = {
     type: 'success',
     exit_code: number,
     gas_consumed: number,
@@ -73,7 +73,7 @@ type SuccessfulExecutionResult = {
     logs: string
 }
 
-type ExecutionResult = FailedExecutionResult | SuccessfulExecutionResult
+export type ExecutionResult = FailedExecutionResult | SuccessfulExecutionResult
 
 const decodeLogs = (logs: string) => Buffer.from(logs, 'base64').toString()
 
