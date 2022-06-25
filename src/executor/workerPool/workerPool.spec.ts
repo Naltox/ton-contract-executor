@@ -36,5 +36,6 @@ describe('ExecutorPool', () => {
             pr.push(pool.execute(config as any))
         }
         await Promise.all(pr)
+        await pool.cleanup()
     })
 })

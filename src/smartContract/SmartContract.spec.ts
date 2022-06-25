@@ -6,6 +6,7 @@ import {
 import BN from "bn.js";
 import {cellToBoc} from "../utils/cell";
 import {SendMsgAction} from "../utils/parseActionList";
+import { TvmRunnerAsynchronous } from "../executor/TvmRunner";
 
 describe('SmartContract', () => {
     it('should run basic contract', async () => {
@@ -296,5 +297,10 @@ describe('SmartContract', () => {
         let contract = await SmartContract.fromFuncSource(source, new Cell())
         let res = await contract.invokeGetMethod('test', [])
         expect(res.exit_code).toEqual(777)
+    })
+
+    afterAll(async () => {
+      // close all opened threads
+      await TvmRunnerAsynchronous.getShared().cleanup()
     })
 })

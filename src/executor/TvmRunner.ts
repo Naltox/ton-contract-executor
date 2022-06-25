@@ -31,4 +31,12 @@ export class TvmRunnerAsynchronous implements TvmRunner  {
         }
         return TvmRunnerAsynchronous.shared
     }
+
+    public canCleanup() {
+      return this.pool.canCleanup()
+    }
+
+    public async cleanup() {
+      return this.pool.cleanup()
+    }
 }

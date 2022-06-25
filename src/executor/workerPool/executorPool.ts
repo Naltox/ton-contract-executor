@@ -22,17 +22,20 @@ export class ExecutorPool {
     private reqNo = 0
     private workers: Worker[] = []
     private tasks = new Map<number, (result: any) => void>()
+    private maxSize: number
+    private processingRequestsCount = 0
 
-    constructor(size: number) {
-        this.setupWorkers(size)
+    constructor(maxSize: number) {
+        this.maxSize = maxSize
     }
 
-    private setupWorkers(size: number) {
-        for (let i = 0; i < size; i++) {
-            let worker = getWorker()
-            worker.on('message', msg => this.onWorkerMessage(msg))
-            this.workers.push(worker)
-        }
+    private createWorker() {
+        let worker = getWorker()
+        worker.on('message', msg => {
+          this.processingRequestsCount--
+          this.onWorkerMessage(msg)
+        })
+        this.workers.push(worker)
     }
 
     private onWorkerMessage(message: WorkerResponseMessage) {
@@ -45,9 +48,13 @@ export class ExecutorPool {
     }
 
     execute(config: TVMExecuteConfig): Promise<TVMExecutionResult> {
+        if (!this.workers.length || (this.workers.length < this.maxSize && this.processingRequestsCount > 0)) {
+          this.createWorker()
+        }
         let requestId = this.reqNo++
         let worker = this.workers[requestId % this.workers.length]
 
+        this.processingRequestsCount++
         worker.postMessage({
             id: requestId,
             config
@@ -56,5 +63,20 @@ export class ExecutorPool {
         return new Promise(resolve => {
             this.tasks.set(requestId, resolve)
         })
+    }
+
+    public canCleanup() {
+      return this.processingRequestsCount <= 0;
+    }
+
+    public async cleanup() {
+      if (!this.canCleanup()) {
+        throw new Error('cant cleanup now')
+      }
+      const workers = this.workers;
+      this.workers = [];
+      for(const worker of workers) {
+        await worker.terminate()
+      }
     }
 }

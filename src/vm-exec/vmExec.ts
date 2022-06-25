@@ -19,6 +19,7 @@ async function getInstance() {
     instance = await VmExec()
     // Notify all waiters
     waiters.map(w => w(instance))
+    waiters = []
     return instance
 }
 

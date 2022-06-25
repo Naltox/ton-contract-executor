@@ -3,7 +3,6 @@ import {
     buildC7,
     C7Config,
     getSelectorForMethod,
-    runTVM,
     TVMStack,
     TVMStackEntry,
     TVMStackEntryTuple
@@ -100,7 +99,7 @@ export class SmartContract {
         this.config = {
             getMethodsMutate: config?.getMethodsMutate ?? false,
             debug: config?.debug ?? false,
-            runner: TvmRunnerAsynchronous.getShared()
+            runner: config?.runner ?? TvmRunnerAsynchronous.getShared()
         }
     }
 
